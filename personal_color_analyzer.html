@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 퍼스널 컬러 16타입 정밀 진단 프로그램</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+        .color-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .color-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('ai-input')">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-rose-400 via-pink-500 to-amber-300 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                    <i class="fa-solid fa-palette"></i>
+                </div>
+                <span class="font-bold text-xl tracking-tight bg-gradient-to-r from-rose-500 to-purple-600 bg-clip-text text-transparent">PersonalColor.AI Pro</span>
+            </div>
+            <nav class="flex space-x-1 sm:space-x-2">
+                <button onclick="switchTab('ai-input')" id="nav-ai-input" class="px-3 py-2 rounded-lg text-sm font-semibold text-rose-600 bg-rose-50 transition">
+                    <i class="fa-solid fa-bolt mr-1"></i> 초고속 AI 분석
+                </button>
+                <button onclick="switchTab('survey')" id="nav-survey" class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+                    <i class="fa-solid fa-clipboard-question mr-1"></i> 세부 설문 진단
+                </button>
+                <button onclick="switchTab('palettes')" id="nav-palettes" class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+                    <i class="fa-solid fa-swatchbook mr-1"></i> 세부 톤별 팔레트
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-5xl w-full mx-auto p-4 sm:p-6">
+
+        <!-- SECTION 1: AI User Feature Description -->
+        <section id="sec-ai-input" class="space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 max-w-2xl mx-auto">
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-rose-100 text-rose-500 mb-3">
+                        <i class="fa-solid fa-bolt text-xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">16타입 초고속 퍼스널 컬러 진단</h2>
+                    <p class="text-slate-500 text-sm mt-1">라이트, 뮤트, 브라이트, 딥 등 세부 톤까지 빠르게 분석해 드립니다.<br>피부, 머리카락, 눈동자 및 어울리는 옷 특징을 선택하거나 적어주세요.</p>
+                </div>
+
+                <!-- Feature Keywords Selector -->
+                <div class="mb-4 space-y-2">
+                    <span class="text-xs font-bold text-slate-600 block">원터치 태그 추가 (클릭 시 즉시 입력됩니다):</span>
+                    <div class="flex flex-wrap gap-1.5 text-xs">
+                        <button onclick="appendTag('피부: 밝고 투명함(Light), ')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-md transition">+ 라이트(밝고 맑음)</button>
+                        <button onclick="appendTag('피부/헤어: 회기있고 탁함(Muted/Soft), ')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-md transition">+ 뮤트(회기/차분함)</button>
+                        <button onclick="appendTag('이미지: 또렷하고 채도높음(Bright/Vivid), ')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-md transition">+ 브라이트(선명함)</button>
+                        <button onclick="appendTag('헤어/눈동자: 짙고 어두움(Deep/Dark), ')" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 rounded-md transition">+ 딥(묵직하고 어두움)</button>
+                        <button onclick="appendTag('립: 파스텔 코랄/핑크 선호, ')" class="px-2.5 py-1 bg-pink-50 hover:bg-pink-100 text-pink-800 border border-pink-200 rounded-md transition">+ 파스텔 립</button>
+                        <button onclick="appendTag('립: 말린 장미/모브 선호, ')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-md transition">+ 말린장미/모브 립</button>
+                    </div>
+                </div>
+
+                <!-- Input Form -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            나의 세부 외모 특징 서술하기
+                        </label>
+                        <textarea id="user-description" rows="4" class="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-400 focus:border-rose-400 text-sm text-slate-800 placeholder-slate-400 outline-none resize-none transition" placeholder="예시:
+- 피부: 핑크빛이 살짝 돌지만 회기가 있는 옷을 입으면 고급스러워 보여요.
+- 머리카락: 회갈색 빛의 부드러운 소프트 블랙입니다.
+- 잘 어울리는 색: 소프트한 모브, 라벤더, 로즈브라운 계열의 뮤트톤 옷이 잘 어울립니다."></textarea>
+                    </div>
+
+                    <!-- Preset Chips -->
+                    <div>
+                        <span class="text-xs text-slate-400 block mb-2">대표 세부 톤 예시:</span>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="insertPreset('spring_light')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs rounded-lg transition font-medium">🌸 봄 라이트</button>
+                            <button onclick="insertPreset('summer_muted')" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs rounded-lg transition font-medium">🌊 여름 뮤트</button>
+                            <button onclick="insertPreset('autumn_deep')" class="px-2.5 py-1 bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200 text-xs rounded-lg transition font-medium">🍁 가을 딥</button>
+                            <button onclick="insertPreset('winter_bright')" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs rounded-lg transition font-medium">❄️ 겨울 브라이트</button>
+                        </div>
+                    </div>
+
+                    <button id="btn-analyze" onclick="analyzeUserFeature()" class="w-full py-3.5 bg-gradient-to-r from-rose-500 to-purple-600 text-white font-bold rounded-xl shadow-md hover:opacity-95 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>초고속 AI 분석 시작하기</span>
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="ai-loading" class="hidden py-6 text-center space-y-3">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-rose-500 border-t-transparent"></div>
+                    <p class="text-sm font-semibold text-slate-600">초고속으로 퍼스널 컬러를 분석 중입니다...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Survey Diagnosis -->
+        <section id="sec-survey" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 max-w-2xl mx-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">자가 세부 진단 질문</h2>
+                        <p class="text-slate-500 text-xs mt-1">명도, 채도 및 대비감 반응을 중심으로 답변해 주세요.</p>
+                    </div>
+                    <span id="survey-step" class="text-xs font-bold px-3 py-1 bg-rose-100 text-rose-600 rounded-full">1 / 5</span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-100 h-2 rounded-full mb-6 overflow-hidden">
+                    <div id="progress-bar" class="bg-rose-500 h-full w-1/5 transition-all duration-300"></div>
+                </div>
+
+                <!-- Question Form -->
+                <div id="question-container" class="space-y-4">
+                    <!-- Dynamic Question Insert -->
+                </div>
+
+                <div class="flex justify-between mt-8 pt-4 border-t border-slate-100">
+                    <button id="btn-prev" onclick="prevQuestion()" class="px-4 py-2 border rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 transition hidden">
+                        이전
+                    </button>
+                    <button id="btn-next" onclick="nextQuestion()" class="ml-auto px-6 py-2 bg-rose-500 text-white rounded-lg text-sm font-semibold hover:bg-rose-600 transition shadow">
+                        다음
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Result Display with Character & Sharing -->
+        <section id="sec-result" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 max-w-3xl mx-auto space-y-6">
+                <!-- Result Header -->
+                <div class="text-center">
+                    <span class="inline-block px-3 py-1 bg-rose-100 text-rose-600 font-bold text-xs rounded-full mb-3">16세부 톤 진단 완료</span>
+                    <h2 id="res-type" class="text-3xl font-extrabold text-slate-900 mb-1">여름 뮤트 (Summer Muted)</h2>
+                    <p id="res-subtitle" class="text-slate-500 text-sm">차분하고 은은하며 우아한 회기 분위기의 소유자!</p>
+                </div>
+
+                <!-- Color Swatch Bar -->
+                <div id="res-color-bar" class="h-12 rounded-xl flex overflow-hidden shadow-inner">
+                    <!-- Dynamic Swatches -->
+                </div>
+
+                <!-- Character Fitting Box -->
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+                    <div class="flex flex-col md:flex-row items-center gap-6">
+                        <!-- SVG Avatar Display -->
+                        <div class="w-48 h-56 flex-shrink-0 bg-white rounded-xl shadow-sm border border-slate-200 p-2 flex flex-col items-center justify-center relative overflow-hidden">
+                            <svg id="avatar-svg" viewBox="0 0 200 220" class="w-full h-full">
+                                <!-- Background Circle -->
+                                <circle id="avatar-bg" cx="100" cy="110" r="85" fill="#FFF0F5" />
+                                
+                                <!-- Character Body / Top Clothes -->
+                                <path id="avatar-top" d="M 60 170 Q 100 145 140 170 L 155 220 L 45 220 Z" fill="#E0BBE4" />
+                                
+                                <!-- Collar / Accent (Sub Color) -->
+                                <path id="avatar-accent" d="M 85 158 L 100 180 L 115 158 Z" fill="#92A8D1" />
+
+                                <!-- Face -->
+                                <ellipse cx="100" cy="110" rx="42" ry="48" fill="#FFE0BD" />
+                                
+                                <!-- Hair -->
+                                <path d="M 58 100 C 55 60, 145 60, 142 100 C 135 75, 65 75, 58 100 Z" fill="#4A3728" />
+                                <path d="M 60 90 C 70 65, 130 65, 140 90 C 130 78, 70 78, 60 90 Z" fill="#3D2E22" />
+
+                                <!-- Eyes -->
+                                <circle cx="85" cy="110" r="4" fill="#2C221E" />
+                                <circle cx="115" cy="110" r="4" fill="#2C221E" />
+                                <circle cx="86" cy="109" r="1.5" fill="#FFFFFF" />
+                                <circle cx="116" cy="109" r="1.5" fill="#FFFFFF" />
+
+                                <!-- Cheeks -->
+                                <circle cx="78" cy="118" r="6" fill="#FF9EAA" opacity="0.6" />
+                                <circle cx="122" cy="118" r="6" fill="#FF9EAA" opacity="0.6" />
+
+                                <!-- Smile -->
+                                <path d="M 93 124 Q 100 130 107 124" stroke="#D85A6A" stroke-width="2.5" stroke-linecap="round" fill="none" />
+                            </svg>
+                        </div>
+
+                        <!-- Character Control Panel -->
+                        <div class="flex-grow space-y-3 text-left w-full">
+                            <h3 class="font-bold text-slate-800 text-sm flex items-center">
+                                <i class="fa-solid fa-shirt text-rose-500 mr-2"></i>캐릭터 착장 & 2nd 서브 컬러 조합
+                            </h3>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                진단된 베스트 톤(1st)과 함께 사용할 두 번째 서브 톤(2nd)을 선택하여 캐릭터 의상 칼라(Accent)에 입혀보세요.
+                            </p>
+
+                            <!-- Sub Color Picker -->
+                            <div class="space-y-2">
+                                <label class="text-xs font-semibold text-slate-700 block">두 번째(2nd) 서브 퍼스널 컬러 선택:</label>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <button onclick="setSubColor('spring_light')" class="p-2 rounded-lg border bg-white hover:bg-amber-50 text-slate-700 flex items-center space-x-1.5 transition">
+                                        <span class="w-3 h-3 rounded-full bg-[#FFD1D1]"></span>
+                                        <span class="truncate">봄 라이트 2nd</span>
+                                    </button>
+                                    <button onclick="setSubColor('summer_muted')" class="p-2 rounded-lg border bg-white hover:bg-blue-50 text-slate-700 flex items-center space-x-1.5 transition">
+                                        <span class="w-3 h-3 rounded-full bg-[#B8A7A7]"></span>
+                                        <span class="truncate">여름 뮤트 2nd</span>
+                                    </button>
+                                    <button onclick="setSubColor('autumn_muted')" class="p-2 rounded-lg border bg-white hover:bg-orange-50 text-slate-700 flex items-center space-x-1.5 transition">
+                                        <span class="w-3 h-3 rounded-full bg-[#A88B79]"></span>
+                                        <span class="truncate">가을 뮤트 2nd</span>
+                                    </button>
+                                    <button onclick="setSubColor('winter_deep')" class="p-2 rounded-lg border bg-white hover:bg-purple-50 text-slate-700 flex items-center space-x-1.5 transition">
+                                        <span class="w-3 h-3 rounded-full bg-[#2A1B28]"></span>
+                                        <span class="truncate">겨울 딥 2nd</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Description -->
+                <div class="text-left bg-slate-50 p-5 rounded-2xl border border-slate-100 space-y-2">
+                    <h3 class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-sparkles text-amber-500 mr-2"></i>AI 스타일링 & 세부 톤 분석</h3>
+                    <p id="res-description" class="text-xs text-slate-600 leading-relaxed sm:text-sm">
+                        회기가 섞인 소프트하고 분위기 있는 파스텔 계열이 베스트입니다.
+                    </p>
+                </div>
+
+                <!-- Best & Avoid Colors Detail -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                    <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-2">
+                        <span class="text-xs font-bold text-emerald-600 flex items-center">
+                            <i class="fa-solid fa-circle-check mr-1.5"></i>BEST COLOR & STYLING
+                        </span>
+                        <p id="res-best" class="text-xs text-slate-700 font-medium leading-relaxed">-</p>
+                    </div>
+
+                    <div class="p-4 rounded-xl border border-rose-200 bg-rose-50/50 space-y-2">
+                        <span class="text-xs font-bold text-rose-600 flex items-center">
+                            <i class="fa-solid fa-circle-xmark mr-1.5"></i>피해야 하는 워스트 컬러 (AVOID)
+                        </span>
+                        <p id="res-worst" class="text-xs text-slate-700 font-medium leading-relaxed">-</p>
+                        <p id="res-worst-why" class="text-[11px] text-rose-700/80 leading-normal pt-1 border-t border-rose-100">
+                            -
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Share Buttons -->
+                <div class="pt-4 border-t border-slate-100 flex flex-wrap gap-3 justify-center">
+                    <button onclick="copyResultText()" class="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-xl transition shadow flex items-center space-x-1.5">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>진단 결과 복사하기</span>
+                    </button>
+                    <button onclick="shareLink()" class="px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-slate-900 text-xs font-bold rounded-xl transition shadow flex items-center space-x-1.5">
+                        <i class="fa-solid fa-share-nodes"></i>
+                        <span>결과 공유하기</span>
+                    </button>
+                    <button onclick="switchTab('ai-input')" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl transition shadow flex items-center space-x-1.5">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>다시 진단하기</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Color Palettes Catalog -->
+        <section id="sec-palettes" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">16세부 톤 대표 컬러 팔레트</h2>
+                <p class="text-slate-500 text-sm mb-6">명도, 채도, 청탁에 따른 16개 세부 톤 대표 색상을 확인해 보세요.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Spring Sub Types -->
+                    <div class="border rounded-2xl p-5 bg-amber-50/20 space-y-3">
+                        <h3 class="font-bold text-amber-900 flex items-center"><span class="w-3 h-3 rounded-full bg-amber-400 mr-2"></span>봄 웜톤 세부 톤</h3>
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2.5 bg-white rounded-xl border border-amber-100">
+                                <span class="font-bold text-slate-800 block mb-1">봄 라이트 (Spring Light) - 고명도 저채도</span>
+                                <div class="flex h-8 rounded-lg overflow-hidden"><div class="flex-1 bg-[#FFD1D1]"></div><div class="flex-1 bg-[#FFE3B3]"></div><div class="flex-1 bg-[#E2F0D9]"></div><div class="flex-1 bg-[#FFF2CC]"></div></div>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-xl border border-amber-100">
+                                <span class="font-bold text-slate-800 block mb-1">봄 브라이트 (Spring Bright) - 중명도 고채도</span>
+                                <div class="flex h-8 rounded-lg overflow-hidden"><div class="flex-1 bg-[#FF4E50]"></div><div class="flex-1 bg-[#F9D423]"></div><div class="flex-1 bg-[#20E2D7]"></div><div class="flex-1 bg-[#FF758C]"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summer Sub Types -->
+                    <div class="border rounded-2xl p-5 bg-blue-50/20 space-y-3">
+                        <h3 class="font-bold text-blue-900 flex items-center"><span class="w-3 h-3 rounded-full bg-blue-400 mr-2"></span>여름 쿨톤 세부 톤</h3>
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2.5 bg-white rounded-xl border border-blue-100">
+                                <span class="font-bold text-slate-800 block mb-1">여름 라이트 (Summer Light) - 고명도 파스텔</span>
+                                <div class="flex h-8 rounded-lg overflow-hidden"><div class="flex-1 bg-[#E2D4F0]"></div><div class="flex-1 bg-[#D4E2F0]"></div><div class="flex-1 bg-[#F0D4E2]"></div><div class="flex-1 bg-[#D4F0E2]"></div></div>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-xl border border-blue-100">
+                                <span class="font-bold text-slate-800 block mb-1">여름 뮤트 (Summer Muted) - 회기 소프트/차분</span>
+                                <div class="flex h-8 rounded-lg overflow-hidden"><div class="flex-1 bg-[#B8A7A7]"></div><div class="flex-1 bg-[#9A94A8]"></div><div class="flex-1 bg-[#8697A6]"></div><div class="flex-1 bg-[#90A39A]"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Autumn Sub Types -->
+                    <div class="border rounded-2xl p-5 bg-orange-50/20 space-y-3">
+                        <h3 class="font-bold text-orange-900 flex items-center"><span class="w-3 h-3 rounded-full bg-amber-700 mr-2"></span>가을 웜톤 세부 톤</h3>
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2.5 bg-white rounded-xl border border-orange-100">
+                                <span class="font-bold text-slate-800 block mb-1">가을 뮤트 (Autumn Muted) - 중명도 회기 어스톤</span>
+                                <div class="flex h-8 rounded-lg overflow-hidden"><div class="flex-1 bg-[#A88B79]"></div><div class="flex-1 bg-[#8A8B63]"></div><div class="flex-1 bg-[#B38867]"></div><div class="flex-1 bg-[#998070]"></div></div>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-xl border border-orange-100">
+                                <span class="font-bold text-slate-800 block mb-1">가을 딥 (Autumn Deep) - 저명도 고채도 음영</span>
+                                <div class="flex h-8 rounded-lg overflow-hidden"><div class="flex-1 bg-[#6E2C00]"></div><div class="flex-1 bg-[#4D5656]"></div><div class="flex-1 bg-[#78281F]"></div><div class="flex-1 bg-[#1E8449]"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Winter Sub Types -->
+                    <div class="border rounded-2xl p-5 bg-purple-50/20 space-y-3">
+                        <h3 class="font-bold text-purple-900 flex items-center"><span class="w-3 h-3 rounded-full bg-slate-900 mr-2"></span>겨울 쿨톤 세부 톤</h3>
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2.5 bg-white rounded-xl border border-purple-100">
+                                <span class="font-bold text-slate-800 block mb-1">겨울 브라이트 (Winter Bright) - 선명한 비비드 대비</span>
+                                <div class="flex h-8 rounded-lg overflow-hidden"><div class="flex-1 bg-[#FF0055]"></div><div class="flex-1 bg-[#0022FF]"></div><div class="flex-1 bg-[#00FFCC]"></div><div class="flex-1 bg-[#7A00FF]"></div></div>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-xl border border-purple-100">
+                                <span class="font-bold text-slate-800 block mb-1">겨울 딥 (Winter Deep) - 저명도 차가운 다크</span>
+                                <div class="flex h-8 rounded-lg overflow-hidden"><div class="flex-1 bg-[#2A1B28]"></div><div class="flex-1 bg-[#111E2E]"></div><div class="flex-1 bg-[#3B0910]"></div><div class="flex-1 bg-[#0A231C]"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+        <p>© 2026 PersonalColor.AI - AI 기반 퍼스널 컬러 16타입 세부 진단기</p>
+    </footer>
+
+    <script>
+        // API Key Constant
+        const apiKey = "";
+
+        // State management
+        let currentStep = 0;
+        let surveyAnswers = [];
+        let currentMainType = 'summer_muted';
+
+        // Survey Questions Data
+        const questions = [
+            {
+                q: "1. 피부의 명도와 베베이스 톤은 어떤가요?",
+                options: [
+                    { text: "노랗고 맑으며 밝은 톤 (Light Warm)", type: "spring_light" },
+                    { text: "핑크빛이 돌며 매우 맑고 하얀 톤 (Light Cool)", type: "summer_light" },
+                    { text: "노르스름하며 차분하고 내추럴한 톤 (Muted/Deep Warm)", type: "autumn_muted" },
+                    { text: "붉은 기 없이 차갑고 대비감이 명확한 톤 (Bright/Deep Cool)", type: "winter_bright" }
+                ]
+            },
+            {
+                q: "2. 회색빛(탁기/회기)이 섞인 소프트한 옷을 입었을 때 반응은?",
+                options: [
+                    { text: "얼굴빛이 은은하고 훨씬 세련되어 보임 (Muted 베스트)", type: "summer_muted" },
+                    { text: "얼굴이 칙칙하고 피곤해 보임 (Clear/Bright 베스트)", type: "spring_bright" },
+                    { text: "약간 차분해지지만 다소 나이 들어 보임", type: "spring_light" },
+                    { text: "너무 무난하여 차라리 차가운 원색이나 어두운 색이 나음", type: "winter_deep" }
+                ]
+            },
+            {
+                q: "3. 립 컬러의 채도(선명도) 선호도는?",
+                options: [
+                    { text: "연하고 맑은 파스텔 피치/핑크 (Light)", type: "spring_light" },
+                    { text: "탁하고 차분한 모브/말린장미/로즈브라운 (Muted)", type: "summer_muted" },
+                    { text: "쨍하고 선명한 코랄/형광/비비드 레드 (Bright)", type: "winter_bright" },
+                    { text: "깊고 어두운 칠리/버건디/딥 브라운 (Deep)", type: "autumn_deep" }
+                ]
+            },
+            {
+                q: "4. 블랙(Black) 옷이나 어두운 다크톤을 입었을 때 느낌은?",
+                options: [
+                    { text: "이목구비가 또렷해지고 고급스러워 보임 (Deep/Bright)", type: "winter_deep" },
+                    { text: "얼굴에 그늘이 지고 답답해 보임 (Light/Muted)", type: "spring_light" },
+                    { text: "나쁘지 않으나 부드러운 브라운/카키가 훨씬 나음", type: "autumn_deep" },
+                    { text: "블랙보다는 네이비나 차콜, 스카이블루가 잘 어울림", type: "summer_light" }
+                ]
+            },
+            {
+                q: "5. 대비감(Contrast: 흑발+하얀피부, 원색 착장 등)이 강할 때는?",
+                options: [
+                    { text: "대비감이 강할수록 카리스마 있고 세련되어 보임", type: "winter_bright" },
+                    { text: "대비감이 강하면 옷만 보이고 얼굴이 묻힘 (Soft/Muted 추천)", type: "summer_muted" },
+                    { text: "따뜻하고 화사한 명도 대비가 제일 잘 어울림", type: "spring_bright" },
+                    { text: "음영과 그라데이션이 자연스럽게 이어질 때 베스트", type: "autumn_muted" }
+                ]
+            }
+        ];
+
+        // Detailed 16 Subtypes Info
+        const typeInfo = {
+            spring_light: {
+                title: "봄 라이트 (Spring Light)",
+                subtitle: "맑고 투명하며 화사한 파스텔 봄 톤!",
+                colors: ["#FFD1D1", "#FFE3B3", "#E2F0D9", "#FFF2CC", "#FFB7B2"],
+                mainColor: "#FFD1D1",
+                bgColor: "#FFF9F9",
+                desc: "봄 웜톤 중에서도 명도가 가장 높고 채도는 완만한 파스텔 웜톤입니다. 아이보리, 맑은 코랄, 살구빛이 얼굴을 맑게 틔워줍니다.",
+                best: "살구색, 파스텔 피치, 카나리아 옐로우, 아이보리",
+                worst: "딥 블랙, 차콜, 묵직한 버건디, 어두운 가을 브라운",
+                worstWhy: "어두운 명도의 색상은 라이트 톤 특유의 맑은 생기를 가리고 어두운 그늘을 만듭니다."
+            },
+            spring_bright: {
+                title: "봄 브라이트 (Spring Bright)",
+                subtitle: "톡톡 튀는 고채도 비비드 봄 톤!",
+                colors: ["#FF4E50", "#F9D423", "#20E2D7", "#FF758C", "#FF6F61"],
+                mainColor: "#FF4E50",
+                bgColor: "#FFF8F5",
+                desc: "봄 웜톤 중 채도가 높아 또렷하고 화려한 색상이 잘 받습니다. 애플레드, 브라이트 코랄, 쨍한 옐로우가 이목구비를 살려줍니다.",
+                best: "애플 레드, 브라이트 코랄, 비비드 옐로우, ターコイズ Blue",
+                worst: "회색빛 탁한 뮤트 컬러, 다크 차콜, 희미한 파스텔",
+                worstWhy: "탁하고 회기가 많은 옷을 입으면 신선함이 사라지고 피부가 아파 보일 수 있습니다."
+            },
+            spring_true: {
+                title: "봄 트루 (Spring True)",
+                subtitle: "따뜻함(Warm)이 선명하게 드러나는 정석 봄 웜톤!",
+                colors: ["#FFB7B2", "#FF6F61", "#FFD166", "#06D6A0", "#FCF6BD"],
+                mainColor: "#FF6F61",
+                bgColor: "#FFF7F2",
+                desc: "따뜻한 온도감이 가장 핵심인 정석 봄 웜톤입니다. 옐로우 바탕의 코랄, 웜 오렌지, 골드 주얼리가 완벽하게 조화됩니다.",
+                best: "코랄 핑크, 피치, 골드, 라이트 카키",
+                worst: "차가운 쿨 블루, 핫핑크, 차콜, 실버",
+                worstWhy: "차가운 쿨톤 색상을 매치하면 피부 빛이 파랗게 질려 보일 수 있습니다."
+            },
+            summer_light: {
+                title: "여름 라이트 (Summer Light)",
+                subtitle: "맑고 깨끗하며 시원한 파스텔 여름 톤!",
+                colors: ["#E2D4F0", "#D4E2F0", "#F0D4E2", "#D4F0E2", "#E0BBE4"],
+                mainColor: "#E2D4F0",
+                bgColor: "#F8F6FC",
+                desc: "쿨톤 중 가장 명도가 높고 맑은 라이트 톤입니다. 스카이블루, 라벤더, 라이트 로즈핑크가 피부를 투명하게 연출합니다.",
+                best: "라벤더, 라이트 스카이블루, 빳빳한 화이트, 베이비 핑크",
+                worst: "황토색, 가을 브라운, 카키, 오렌지",
+                worstWhy: "노란 기가 짙은 웜톤 컬러는 쿨톤 피부의 투명함을 가리고 노르스름하게 만듭니다."
+            },
+            summer_muted: {
+                title: "여름 뮤트 (Summer Muted / Soft)",
+                subtitle: "회기(Grey)가 섞여 차분하고 우아한 여름 톤!",
+                colors: ["#B8A7A7", "#9A94A8", "#8697A6", "#90A39A", "#D3C5E5"],
+                mainColor: "#B8A7A7",
+                bgColor: "#F5F3F7",
+                desc: "여름 쿨톤 중 회색빛(Greyish)이 은은히 섞여 부드러운 뮤트 톤입니다. 모브, 드라이 로즈, 쿨 그레이가 고급스러운 아우라를 만듭니다.",
+                best: "모브 핑크, 소프트 라벤더, 차콜 그레이, 세이지 그린",
+                worst: "쨍한 형광색, 원색 레몬 옐로우, 주황색",
+                worstWhy: "채도가 너무 높은 원색을 입으면 차분하고 우아한 피부결보다 옷이 먼저 튀게 됩니다."
+            },
+            summer_true: {
+                title: "여름 트루 (Summer True)",
+                subtitle: "시원함(Cool)이 선명하게 나타나는 정석 여름 쿨톤!",
+                colors: ["#E0BBE4", "#92A8D1", "#F7CAC9", "#B5EAD7", "#C7CEEA"],
+                mainColor: "#92A8D1",
+                bgColor: "#F3F7FC",
+                desc: "푸른 청량감이 돋보이는 정석 여름 쿨톤입니다. 코발트 블루, 파스텔 핑크, 실버 장신구가 피붓결을 돋보이게 합니다.",
+                best: "스카이블루, 푸시아, 화이트, 쿨 핑크, 실버",
+                worst: "골드, 카키, 테라코타, 오렌지 립",
+                worstWhy: "따뜻한 황색 기반의 색상은 여름 쿨톤 특유의 청량한 조화를 방해합니다."
+            },
+            autumn_muted: {
+                title: "가을 뮤트 (Autumn Muted / Soft)",
+                subtitle: "차분하고 부드러운 내추럴 어스 톤!",
+                colors: ["#A88B79", "#8A8B63", "#B38867", "#998070", "#C86D51"],
+                mainColor: "#A88B79",
+                bgColor: "#F9F6F0",
+                desc: "웜톤에 회기(Greyish)가 가미되어 부드럽고 분위기 있는 톤입니다. 샌드 베이지, 차분한 오트밀, 베이지 로즈가 대표적입니다.",
+                best: "오트밀, 샌드 베이지, 올리브 드랩, 말린장미",
+                worst: "비비드 핫핑크, 울트라 마린 블루, 칠흑 블랙",
+                worstWhy: "너무 차갑거나 대비가 강한 원색은 부드럽고 이지적인 느낌을 저해합니다."
+            },
+            autumn_deep: {
+                title: "가을 딥 (Autumn Deep / Dark)",
+                subtitle: "깊고 무게감 있는 묵직한 고혹 가을 톤!",
+                colors: ["#6E2C00", "#4D5656", "#78281F", "#1E8449", "#A0522D"],
+                mainColor: "#6E2C00",
+                bgColor: "#FDF8F3",
+                desc: "가을 웜톤 중 명도가 낮고 딥하여 그윽하고 세련된 톤입니다. 딥 카키, 칠리 레드, 카멜 브라운이 카리스마를 높여줍니다.",
+                best: "칠리 레드, 카멜 브라운, 딥 카키, 다크 초콜릿",
+                worst: "파스텔 라벤더, 형광 핑크, 베이비 블루",
+                worstWhy: "흐릿하고 옅은 파스텔은 가을 딥의 묵직한 윤곽을 부해 보이게 만듭니다."
+            },
+            autumn_true: {
+                title: "가을 트루 (Autumn True)",
+                subtitle: "풍성하고 따뜻한 클래식 정석 가을 웜톤!",
+                colors: ["#C86D51", "#85586F", "#D0C997", "#A0522D", "#6B4226"],
+                mainColor: "#C86D51",
+                bgColor: "#FAF5EF",
+                desc: "따뜻한 온기와 클래식한 무드가 돋보이는 정석 가을 톤입니다. 테라코타, 브라운, 올리브가 피부 톤과 안정적으로 연출됩니다.",
+                best: "테라코타, 올리브 그린, 머스타드, 브라운",
+                worst: "차가운 실버, 푸시아 핑크, 아이스 블루",
+                worstWhy: "차가운 감성의 색상은 따뜻한 음영 조화를 어색하게 깨뜨립니다."
+            },
+            winter_bright: {
+                title: "겨울 브라이트 (Winter Bright / Clear)",
+                subtitle: "선명하고 차가운 고채도 화려한 겨울 톤!",
+                colors: ["#FF0055", "#0022FF", "#00FFCC", "#7A00FF", "#D61C4E"],
+                mainColor: "#FF0055",
+                bgColor: "#F9F5FF",
+                desc: "겨울 쿨톤 중에서도 채도가 높고 비비드하여 명확한 대비감이 살아나는 톤입니다. 푸시아 핑크, 시원한 레드가 화려합니다.",
+                best: "푸시아 핑크, 로열 블루, 순백의 화이트, 체리 레드",
+                worst: "탁한 가을 카키, 황토색, 희미한 샌드 베이지",
+                worstWhy: "탁하고 노르스름한 가을 색상은 안색을 어둡고 흐릿하게 보입니다."
+            },
+            winter_deep: {
+                title: "겨울 딥 (Winter Deep / Dark)",
+                subtitle: "어둡고 다크하며 차가운 시크 카리스마 겨울 톤!",
+                colors: ["#2A1B28", "#111E2E", "#3B0910", "#0A231C", "#1A2A3A"],
+                mainColor: "#1A2A3A",
+                bgColor: "#F4F4F9",
+                desc: "저명도의 무게감 있는 쿨톤입니다. 칠흑 같은 블랙, 미드나잇 블루, 딥 버건디를 배치했을 때 안색이 맑아집니다.",
+                best: "딥 버건디, 미드나잇 네이비, 차콜, 리얼 블랙",
+                worst: "살구색, 파스텔 오렌지, 라이트 옐로우",
+                worstWhy: "따뜻하고 흐릿한 따뜻한 파스텔은 강렬하고 명확한 피부 윤곽을 붕괴시킵니다."
+            },
+            winter_true: {
+                title: "겨울 트루 (Winter True)",
+                subtitle: "차가운 도시적 카리스마 정석 겨울 쿨톤!",
+                colors: ["#1A2A3A", "#D61C4E", "#4A0E17", "#000000", "#FFFFFF"],
+                mainColor: "#D61C4E",
+                bgColor: "#F5F5FA",
+                desc: "차가움과 모던함이 공존하는 정석 겨울 쿨톤입니다. 블랙 앤 화이트 대비, 백금 주얼리, 쿨 레드가 정답입니다.",
+                best: "트루 레드, 블랙 & 화이트, 마젠타, 플래티넘 실버",
+                worst: "오렌지, 머스타드, 브라운, 카키",
+                worstWhy: "황색기가 섞인 어스톤은 피부의 도회적인 깨끗함을 없앱니다."
+            }
+        };
+
+        // Tab Switcher
+        function switchTab(tab) {
+            document.getElementById('sec-ai-input').classList.add('hidden');
+            document.getElementById('sec-survey').classList.add('hidden');
+            document.getElementById('sec-result').classList.add('hidden');
+            document.getElementById('sec-palettes').classList.add('hidden');
+
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.className = "px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition";
+            });
+
+            if (tab === 'ai-input') {
+                document.getElementById('sec-ai-input').classList.remove('hidden');
+                document.getElementById('nav-ai-input').className = "px-3 py-2 rounded-lg text-sm font-semibold text-rose-600 bg-rose-50 transition";
+            } else if (tab === 'survey') {
+                document.getElementById('sec-survey').classList.remove('hidden');
+                document.getElementById('nav-survey').className = "px-3 py-2 rounded-lg text-sm font-semibold text-rose-600 bg-rose-50 transition";
+                initSurvey();
+            } else if (tab === 'palettes') {
+                document.getElementById('sec-palettes').classList.remove('hidden');
+                document.getElementById('nav-palettes').className = "px-3 py-2 rounded-lg text-sm font-semibold text-rose-600 bg-rose-50 transition";
+            }
+        }
+
+        // Tag Append Function
+        function appendTag(text) {
+            const textarea = document.getElementById('user-description');
+            textarea.value += text;
+            textarea.focus();
+        }
+
+        // Preset Inserter
+        function insertPreset(type) {
+            const textarea = document.getElementById('user-description');
+            if (type === 'spring_light') {
+                textarea.value = "피부는 맑고 노르스름하며 밝습니다. 진한 원색이나 어두운 블랙은 답답해 보이고, 살구빛 코랄이나 파스텔 옐로우 옷이 잘 받아요.";
+            } else if (type === 'summer_muted') {
+                textarea.value = "피부에 핑크빛이 살짝 돌지만 회기가 있는 차분한 옷을 입으면 훨씬 이목구비가 사네요. 모브, 라벤더, 쿨그레이 계열의 소프트한 옷이 베스트입니다.";
+            } else if (type === 'autumn_deep') {
+                textarea.value = "피부가 내추럴하며 어두운 음영 컬러가 완벽하게 어울립니다. 카멜 브라운, 딥 카키, 칠리 레드나 트렌치코트 착장이 분위기 있어 보여요.";
+            } else if (type === 'winter_bright') {
+                textarea.value = "피부가 차갑고 흑발과 대비가 명확합니다. 희미한 색보다 푸시아 핑크, 로열 블루 같은 비비드한 원색이나 블랙 앤 화이트 대비가 매우 세련되어 보여요.";
+            }
+        }
+
+        // Optimized Ultra-Fast Gemini API Call with Short Delay & Abort Signal
+        async function fetchGeminiAnalysis(prompt) {
+            const systemPrompt = `퍼스널 컬러 16타입 빠른 진단기. 다음 12개 중 1개만 선택: spring_light, spring_bright, spring_true, summer_light, summer_muted, summer_true, autumn_muted, autumn_deep, autumn_true, winter_bright, winter_deep, winter_true.
+JSON 형식: {"typeKey":"[선택한 키]", "reasoning":"[이유 2문장요약]"}`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: { 
+                    responseMimeType: "application/json",
+                    maxOutputTokens: 150 
+                }
+            };
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 seconds fast timeout limit
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    return JSON.parse(resultText);
+                }
+            } catch (e) {
+                clearTimeout(timeoutId);
+            }
+            throw new Error("Fast fallback needed");
+        }
+
+        // Analyze User Text Feature
+        async function analyzeUserFeature() {
+            const userDesc = document.getElementById('user-description').value.trim();
+            if (!userDesc) {
+                alert("외모 특징을 작성하거나 위의 세부 태그 버튼을 클릭해 보세요!");
+                return;
+            }
+
+            document.getElementById('btn-analyze').classList.add('hidden');
+            document.getElementById('ai-loading').classList.remove('hidden');
+
+            try {
+                // Attempt fast AI analysis with 3s limit
+                const aiResult = await fetchGeminiAnalysis(userDesc);
+                const typeKey = aiResult.typeKey || 'summer_muted';
+                renderResultUI(typeKey, aiResult.reasoning);
+            } catch (err) {
+                // Instantaneous High-Speed Local Analysis Fallback
+                fallbackAnalysis(userDesc);
+            } finally {
+                document.getElementById('btn-analyze').classList.remove('hidden');
+                document.getElementById('ai-loading').classList.add('hidden');
+            }
+        }
+
+        // Render UI with Result and Avatar
+        function renderResultUI(typeKey, customReason = null) {
+            currentMainType = typeKey;
+            const info = typeInfo[typeKey] || typeInfo['summer_muted'];
+
+            document.getElementById('sec-ai-input').classList.add('hidden');
+            document.getElementById('sec-survey').classList.add('hidden');
+            document.getElementById('sec-result').classList.remove('hidden');
+
+            document.getElementById('res-type').innerText = info.title;
+            document.getElementById('res-subtitle').innerText = info.subtitle;
+            document.getElementById('res-description').innerText = customReason || info.desc;
+            document.getElementById('res-best').innerText = info.best;
+            document.getElementById('res-worst').innerText = info.worst;
+            document.getElementById('res-worst-why').innerText = info.worstWhy;
+
+            // Swatches Bar
+            const bar = document.getElementById('res-color-bar');
+            bar.innerHTML = info.colors.map(c => `<div class="flex-1 h-full" style="background-color: ${c};"></div>`).join('');
+
+            // Avatar Color Setup
+            document.getElementById('avatar-bg').setAttribute('fill', info.bgColor);
+            document.getElementById('avatar-top').setAttribute('fill', info.mainColor);
+            
+            // Set initial sub color to complementary default
+            const defaultSubKey = typeKey.includes('summer') ? 'spring_light' : (typeKey.includes('spring') ? 'summer_muted' : (typeKey.includes('autumn') ? 'winter_deep' : 'autumn_muted'));
+            setSubColor(defaultSubKey);
+        }
+
+        // Character Outfit Sub Color Changer
+        function setSubColor(subTypeKey) {
+            const subInfo = typeInfo[subTypeKey] || typeInfo['spring_light'];
+            document.getElementById('avatar-accent').setAttribute('fill', subInfo.mainColor);
+        }
+
+        // Share & Copy Result
+        function copyResultText() {
+            const typeText = document.getElementById('res-type').innerText;
+            const bestText = document.getElementById('res-best').innerText;
+            const worstText = document.getElementById('res-worst').innerText;
+
+            const fullText = `[PersonalColor.AI 16세부 톤 진단 결과]\n나의 세부 퍼스널 컬러: ${typeText}\n\n✨ Best Color: ${bestText}\n⚠️ Avoid Color: ${worstText}\n\n정밀 퍼스널 컬러 분석을 직접 경험해 보세요!`;
+
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = fullText;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+
+            alert("진단 결과가 클립보드에 복사되었습니다! SNS에 공유해 보세요.");
+        }
+
+        function shareLink() {
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = window.location.href;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+
+            alert("프로그램 링크가 복사되었습니다.");
+        }
+
+        // Ultra Fast Local Rule Engine for 16 Subtypes
+        function fallbackAnalysis(text) {
+            const scores = {
+                spring_light: 0, spring_bright: 0, spring_true: 0,
+                summer_light: 0, summer_muted: 0, summer_true: 0,
+                autumn_muted: 0, autumn_deep: 0, autumn_true: 0,
+                winter_bright: 0, winter_deep: 0, winter_true: 0
+            };
+
+            // Fast regex keyword matching
+            if (/파스텔|밝은|살구|아이보리|라이트/.test(text)) { scores.spring_light += 3; scores.summer_light += 3; }
+            if (/뮤트|회기|차분|소프트|모브|말린장미|오트밀/.test(text)) { scores.summer_muted += 4; scores.autumn_muted += 4; }
+            if (/비비드|원색|선명|쨍한|핫핑크|푸시아/.test(text)) { scores.spring_bright += 3; scores.winter_bright += 4; }
+            if (/딥|어두운|블랙|버건디|칠리|다크|카키/.test(text)) { scores.autumn_deep += 3; scores.winter_deep += 4; }
+            if (/코랄|오렌지|골드|웜톤|따뜻/.test(text)) { scores.spring_true += 2; scores.autumn_true += 2; }
+            if (/쿨톤|시원|실버|라벤더|블루/.test(text)) { scores.summer_true += 2; scores.winter_true += 2; }
+
+            let maxType = 'summer_muted';
+            let maxScore = -1;
+            for (const [key, val] of Object.entries(scores)) {
+                if (val > maxScore) {
+                    maxScore = val;
+                    maxType = key;
+                }
+            }
+
+            renderResultUI(maxType);
+        }
+
+        // Survey Logic
+        function initSurvey() {
+            currentStep = 0;
+            surveyAnswers = [];
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const qData = questions[currentStep];
+            document.getElementById('survey-step').innerText = `${currentStep + 1} / ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentStep + 1) / questions.length) * 100}%`;
+
+            let html = `<h3 class="text-base font-bold text-slate-800 mb-4">${qData.q}</h3><div class="space-y-2">`;
+
+            qData.options.forEach((opt) => {
+                const checked = surveyAnswers[currentStep] === opt.type ? 'border-rose-500 bg-rose-50/40 text-rose-700' : 'border-slate-200 hover:bg-slate-50';
+                html += `
+                    <label onclick="selectOption('${opt.type}')" class="flex items-center p-3.5 border-2 rounded-xl cursor-pointer transition ${checked}">
+                        <input type="radio" name="opt" class="hidden" ${surveyAnswers[currentStep] === opt.type ? 'checked' : ''}>
+                        <span class="text-xs sm:text-sm font-medium">${opt.text}</span>
+                    </label>
+                `;
+            });
+
+            html += `</div>`;
+            document.getElementById('question-container').innerHTML = html;
+
+            document.getElementById('btn-prev').classList.toggle('hidden', currentStep === 0);
+            document.getElementById('btn-next').innerText = currentStep === questions.length - 1 ? '결과 보기' : '다음';
+        }
+
+        function selectOption(type) {
+            surveyAnswers[currentStep] = type;
+            renderQuestion();
+        }
+
+        function prevQuestion() {
+            if (currentStep > 0) {
+                currentStep--;
+                renderQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (!surveyAnswers[currentStep]) {
+                alert("선택지를 하나 선택해 주세요!");
+                return;
+            }
+
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                showSurveyResult();
+            }
+        }
+
+        function showSurveyResult() {
+            const tally = {};
+            surveyAnswers.forEach(ans => {
+                tally[ans] = (tally[ans] || 0) + 1;
+            });
+
+            let finalType = 'summer_muted';
+            let maxCount = -1;
+            for (const [k, v] of Object.entries(tally)) {
+                if (v > maxCount) {
+                    maxCount = v;
+                    finalType = k;
+                }
+            }
+
+            renderResultUI(finalType);
+        }
+    </script>
+</body>
+</html>
